@@ -1,0 +1,500 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MarkItDown — da documento a Markdown</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;700&family=Inter:wght@400;500&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --paper: #f6f5f1;
+      --ink: #18181b;
+      --muted: #6b6b6b;
+      --line: #e3e1da;
+      --accent: #ffcc00;
+      --accent-deep: #e0b000;
+      --panel: #1b1b1d;
+      --panel-line: #34343a;
+      --panel-text: #e8e8e6;
+      --panel-muted: #8a8a92;
+      --radius: 14px;
+      --maxw: 760px;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      padding: 0;
+      background: var(--paper);
+      color: var(--ink);
+      font-family: "Inter", system-ui, -apple-system, sans-serif;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    body {
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .wrap {
+      width: 100%;
+      max-width: var(--maxw);
+      margin: 0 auto;
+      padding: 0 24px;
+    }
+
+    /* ---------- Header ---------- */
+    header {
+      padding: 28px 0 8px;
+    }
+    .topbar {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+    }
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 11px;
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: 18px;
+      letter-spacing: -0.02em;
+    }
+    .brand .mark {
+      width: 30px;
+      height: 30px;
+      border-radius: 8px;
+      background: var(--accent);
+      color: var(--ink);
+      display: grid;
+      place-items: center;
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: -0.04em;
+    }
+    .topbar .meta {
+      font-size: 12.5px;
+      color: var(--muted);
+      font-variant-numeric: tabular-nums;
+    }
+
+    /* ---------- Hero ---------- */
+    .hero {
+      padding: 56px 0 28px;
+    }
+    .eyebrow {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 12px;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--muted);
+      margin: 0 0 18px;
+    }
+    h1 {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 700;
+      font-size: clamp(34px, 6vw, 50px);
+      line-height: 1.04;
+      letter-spacing: -0.03em;
+      margin: 0 0 16px;
+    }
+    h1 .hl {
+      background: linear-gradient(transparent 62%, var(--accent) 62%);
+      padding: 0 2px;
+    }
+    .lede {
+      font-size: 17px;
+      line-height: 1.55;
+      color: var(--muted);
+      max-width: 52ch;
+      margin: 0;
+    }
+
+    /* ---------- Dropzone (signature) ---------- */
+    .dropzone {
+      margin-top: 36px;
+      border: 1.5px dashed var(--line);
+      border-radius: var(--radius);
+      background: #fff;
+      padding: 48px 28px;
+      text-align: center;
+      cursor: pointer;
+      transition: border-color .18s ease, background .18s ease, transform .18s ease;
+      position: relative;
+    }
+    .dropzone:hover { border-color: var(--accent-deep); }
+    .dropzone:focus-visible {
+      outline: none;
+      border-color: var(--ink);
+      box-shadow: 0 0 0 4px rgba(255,204,0,.35);
+    }
+    .dropzone.drag {
+      border-style: solid;
+      border-color: var(--accent-deep);
+      background: #fffdf2;
+      transform: translateY(-2px);
+    }
+    .dz-icon {
+      width: 56px;
+      height: 56px;
+      margin: 0 auto 18px;
+      border-radius: 12px;
+      background: var(--paper);
+      border: 1px solid var(--line);
+      display: grid;
+      place-items: center;
+    }
+    .dz-icon svg { width: 26px; height: 26px; stroke: var(--ink); }
+    .dz-title {
+      font-family: "Space Grotesk", sans-serif;
+      font-weight: 500;
+      font-size: 18px;
+      margin: 0 0 6px;
+    }
+    .dz-title b { font-weight: 700; border-bottom: 2px solid var(--accent); }
+    .dz-sub { font-size: 13.5px; color: var(--muted); margin: 0; }
+    input[type="file"] { display: none; }
+
+    /* ---------- Format chips ---------- */
+    .formats {
+      margin-top: 22px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+    }
+    .chip {
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11.5px;
+      letter-spacing: .02em;
+      color: var(--muted);
+      background: #fff;
+      border: 1px solid var(--line);
+      border-radius: 999px;
+      padding: 5px 11px;
+    }
+
+    /* ---------- Status / spinner ---------- */
+    .status {
+      margin-top: 24px;
+      display: none;
+      align-items: center;
+      gap: 12px;
+      justify-content: center;
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .status.show { display: flex; }
+    .spinner {
+      width: 18px; height: 18px;
+      border: 2px solid var(--line);
+      border-top-color: var(--ink);
+      border-radius: 50%;
+      animation: spin .7s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+
+    .error {
+      margin-top: 22px;
+      display: none;
+      border: 1px solid #e9c4c4;
+      background: #fbeeee;
+      color: #8a2b2b;
+      border-radius: 10px;
+      padding: 13px 16px;
+      font-size: 14px;
+    }
+    .error.show { display: block; }
+
+    /* ---------- Result panel ---------- */
+    .result {
+      margin-top: 40px;
+      display: none;
+      animation: rise .35s ease both;
+    }
+    .result.show { display: block; }
+    @keyframes rise {
+      from { opacity: 0; transform: translateY(10px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    .result-head {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 12px;
+    }
+    .result-file {
+      font-size: 13.5px;
+      color: var(--muted);
+      font-family: "JetBrains Mono", monospace;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+    }
+    .result-file b { color: var(--ink); font-weight: 500; }
+    .actions { display: flex; gap: 8px; }
+    button.action {
+      font-family: "Space Grotesk", sans-serif;
+      font-size: 13.5px;
+      font-weight: 500;
+      border: 1px solid var(--line);
+      background: #fff;
+      color: var(--ink);
+      border-radius: 9px;
+      padding: 8px 14px;
+      cursor: pointer;
+      transition: background .15s ease, border-color .15s ease;
+    }
+    button.action:hover { background: var(--paper); border-color: var(--muted); }
+    button.action.primary {
+      background: var(--accent);
+      border-color: var(--accent);
+    }
+    button.action.primary:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+    button.action:focus-visible { outline: none; box-shadow: 0 0 0 3px rgba(255,204,0,.45); }
+
+    .panel {
+      background: var(--panel);
+      border: 1px solid var(--panel-line);
+      border-radius: var(--radius);
+      overflow: hidden;
+    }
+    .panel-bar {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      padding: 12px 16px;
+      border-bottom: 1px solid var(--panel-line);
+    }
+    .dot { width: 11px; height: 11px; border-radius: 50%; }
+    .dot.r { background: #ff5f57; } .dot.y { background: #febc2e; } .dot.g { background: #28c840; }
+    .panel-bar .label {
+      margin-left: auto;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 11.5px;
+      color: var(--panel-muted);
+    }
+    pre {
+      margin: 0;
+      padding: 20px 18px;
+      max-height: 52vh;
+      overflow: auto;
+      font-family: "JetBrains Mono", monospace;
+      font-size: 13px;
+      line-height: 1.65;
+      color: var(--panel-text);
+      white-space: pre-wrap;
+      word-break: break-word;
+    }
+
+    /* ---------- Footer ---------- */
+    footer {
+      margin-top: auto;
+      padding: 40px 0 28px;
+      border-top: 1px solid var(--line);
+      color: var(--muted);
+      font-size: 12.5px;
+    }
+    footer .row {
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+    footer a { color: var(--ink); text-decoration: none; border-bottom: 1px solid var(--accent); }
+
+    @media (max-width: 560px) {
+      .hero { padding-top: 40px; }
+      .dropzone { padding: 40px 18px; }
+      .topbar .meta { display: none; }
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation: none !important; transition: none !important; }
+    }
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <header>
+      <div class="topbar">
+        <div class="brand">
+          <span class="mark">M↓</span>
+          MarkItDown
+        </div>
+        <div class="meta">conversione locale · nessun account</div>
+      </div>
+    </header>
+
+    <main class="hero">
+      <p class="eyebrow">Documento → Markdown</p>
+      <h1>Trasforma qualsiasi documento in <span class="hl">Markdown</span> pulito.</h1>
+      <p class="lede">Carica un file e ottieni il testo strutturato in Markdown — titoli, elenchi, tabelle e link inclusi. Il formato viene riconosciuto in automatico.</p>
+
+      <div class="dropzone" id="dropzone" tabindex="0" role="button" aria-label="Carica un documento da convertire">
+        <div class="dz-icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M12 16V4" /><path d="m7 9 5-5 5 5" /><path d="M5 20h14" />
+          </svg>
+        </div>
+        <p class="dz-title">Trascina qui il file o <b>scegline uno</b></p>
+        <p class="dz-sub">Un documento alla volta · max 25 MB</p>
+        <input type="file" id="fileInput" />
+      </div>
+
+      <div class="formats" aria-label="Formati supportati">
+        <span class="chip">PDF</span>
+        <span class="chip">DOCX</span>
+        <span class="chip">PPTX</span>
+        <span class="chip">XLSX</span>
+        <span class="chip">HTML</span>
+        <span class="chip">CSV</span>
+        <span class="chip">JSON</span>
+        <span class="chip">XML</span>
+        <span class="chip">EPUB</span>
+        <span class="chip">ZIP</span>
+        <span class="chip">Immagini</span>
+        <span class="chip">Audio</span>
+      </div>
+
+      <div class="status" id="status">
+        <span class="spinner"></span>
+        <span id="statusText">Conversione in corso…</span>
+      </div>
+
+      <div class="error" id="error" role="alert"></div>
+
+      <section class="result" id="result" aria-live="polite">
+        <div class="result-head">
+          <div class="result-file">Da <b id="srcName">file</b> → <span id="charCount"></span></div>
+          <div class="actions">
+            <button class="action" id="copyBtn">Copia</button>
+            <button class="action primary" id="downloadBtn">Scarica .md</button>
+            <button class="action" id="resetBtn">Nuovo file</button>
+          </div>
+        </div>
+        <div class="panel">
+          <div class="panel-bar">
+            <span class="dot r"></span><span class="dot y"></span><span class="dot g"></span>
+            <span class="label" id="outName">output.md</span>
+          </div>
+          <pre id="output"></pre>
+        </div>
+      </section>
+    </main>
+
+    <footer>
+      <div class="row">
+        <span>Basato su <a href="https://github.com/microsoft/markitdown" target="_blank" rel="noopener">microsoft/markitdown</a></span>
+        <span>I file vengono elaborati e non salvati.</span>
+      </div>
+    </footer>
+  </div>
+
+  <script>
+    const dropzone = document.getElementById("dropzone");
+    const fileInput = document.getElementById("fileInput");
+    const statusEl = document.getElementById("status");
+    const statusText = document.getElementById("statusText");
+    const errorEl = document.getElementById("error");
+    const resultEl = document.getElementById("result");
+    const output = document.getElementById("output");
+    const srcName = document.getElementById("srcName");
+    const charCount = document.getElementById("charCount");
+    const outName = document.getElementById("outName");
+    const copyBtn = document.getElementById("copyBtn");
+    const downloadBtn = document.getElementById("downloadBtn");
+    const resetBtn = document.getElementById("resetBtn");
+
+    let lastMarkdown = "";
+    let lastOutputName = "output.md";
+
+    // --- Apertura selettore file ---
+    dropzone.addEventListener("click", () => fileInput.click());
+    dropzone.addEventListener("keydown", (e) => {
+      if (e.key === "Enter" || e.key === " ") { e.preventDefault(); fileInput.click(); }
+    });
+    fileInput.addEventListener("change", () => {
+      if (fileInput.files.length) handleFile(fileInput.files[0]);
+    });
+
+    // --- Drag & drop ---
+    ["dragenter", "dragover"].forEach((ev) =>
+      dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.add("drag"); })
+    );
+    ["dragleave", "drop"].forEach((ev) =>
+      dropzone.addEventListener(ev, (e) => { e.preventDefault(); dropzone.classList.remove("drag"); })
+    );
+    dropzone.addEventListener("drop", (e) => {
+      const f = e.dataTransfer.files[0];
+      if (f) handleFile(f);
+    });
+
+    // --- Conversione ---
+    async function handleFile(file) {
+      errorEl.classList.remove("show");
+      resultEl.classList.remove("show");
+      statusText.textContent = `Conversione di "${file.name}"…`;
+      statusEl.classList.add("show");
+
+      const form = new FormData();
+      form.append("file", file);
+
+      try {
+        const res = await fetch("/api/convert", { method: "POST", body: form });
+        const data = await res.json();
+
+        if (!res.ok) {
+          throw new Error(data.detail || "Errore durante la conversione.");
+        }
+
+        lastMarkdown = data.markdown || "";
+        lastOutputName = data.output_filename || "output.md";
+
+        output.textContent = lastMarkdown || "(documento vuoto o senza testo estraibile)";
+        srcName.textContent = data.filename;
+        outName.textContent = lastOutputName;
+        charCount.textContent = `${data.characters.toLocaleString("it-IT")} caratteri`;
+        resultEl.classList.add("show");
+        resultEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+      } catch (err) {
+        errorEl.textContent = err.message;
+        errorEl.classList.add("show");
+      } finally {
+        statusEl.classList.remove("show");
+        fileInput.value = "";
+      }
+    }
+
+    // --- Azioni risultato ---
+    copyBtn.addEventListener("click", async () => {
+      await navigator.clipboard.writeText(lastMarkdown);
+      copyBtn.textContent = "Copiato ✓";
+      setTimeout(() => (copyBtn.textContent = "Copia"), 1600);
+    });
+
+    downloadBtn.addEventListener("click", () => {
+      const blob = new Blob([lastMarkdown], { type: "text/markdown;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = lastOutputName;
+      a.click();
+      URL.revokeObjectURL(url);
+    });
+
+    resetBtn.addEventListener("click", () => {
+      resultEl.classList.remove("show");
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    });
+  </script>
+</body>
+</html>
