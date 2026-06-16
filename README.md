@@ -1,3 +1,13 @@
+---
+title: MarkItDown Converter
+emoji: 📄
+colorFrom: blue
+colorTo: indigo
+sdk: docker
+app_port: 8000
+pinned: false
+---
+
 # MarkItDown Converter
 
 Landing page che converte **qualsiasi documento supportato in Markdown**, usando la libreria
@@ -58,6 +68,29 @@ markitdown-app/
 
 > Nota: la trascrizione **audio** richiede `ffmpeg` installato sul sistema. È già incluso
 > nell'immagine Docker; in locale installalo solo se ti serve quel formato.
+
+---
+
+## Deploy su Hugging Face Spaces (gratuito)
+
+1. Vai su [huggingface.co/new-space](https://huggingface.co/new-space).
+2. Scegli un nome, **SDK: Docker**, visibilità pubblica o privata.
+3. Crea lo Space, poi collega il repository GitHub esistente:
+   - **Settings → Repository → Link to GitHub repo**, oppure
+   - aggiungi lo Space come remote git e pusha il codice:
+
+     ```bash
+     git remote add space https://huggingface.co/spaces/<tuo-utente>/<nome-space>
+     git push space main
+     ```
+
+4. Lo Space rileva il `Dockerfile` e i metadati YAML in cima a questo README
+   (`sdk: docker`, `app_port: 8000`) e builda automaticamente.
+5. Al termine del build, l'app è disponibile su
+   `https://<tuo-utente>-<nome-space>.hf.space`.
+
+> Nota: lo Space va in "sleep" dopo un periodo di inattività e si risveglia
+> automaticamente alla prima richiesta (qualche secondo di attesa).
 
 ---
 
