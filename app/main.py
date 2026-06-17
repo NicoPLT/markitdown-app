@@ -23,7 +23,7 @@ from markitdown import (
 
 # Dimensione massima accettata per l'upload (in MB). Modificabile da variabile
 # d'ambiente su Koyeb senza toccare il codice.
-MAX_FILE_SIZE_MB = int(os.getenv("MAX_FILE_SIZE_MB", "25"))
+MAX_FILE_SIZE_MB = int(os.getenv("MAX_FILE_SIZE_MB", "50"))
 MAX_FILE_SIZE = MAX_FILE_SIZE_MB * 1024 * 1024
 
 BASE_DIR = Path(__file__).resolve().parent
