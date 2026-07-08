@@ -4,7 +4,7 @@ emoji: 📄
 colorFrom: blue
 colorTo: indigo
 sdk: docker
-app_port: 8000
+app_port: 7860
 pinned: false
 ---
 
@@ -85,7 +85,7 @@ markitdown-app/
      ```
 
 4. Lo Space rileva il `Dockerfile` e i metadati YAML in cima a questo README
-   (`sdk: docker`, `app_port: 8000`) e builda automaticamente.
+   (`sdk: docker`, `app_port: 7860`) e builda automaticamente.
 5. Al termine del build, l'app è disponibile su
    `https://<tuo-utente>-<nome-space>.hf.space`.
 
