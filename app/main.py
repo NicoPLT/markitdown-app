@@ -12,7 +12,7 @@ import os
 from pathlib import Path
 
 from fastapi import FastAPI, File, HTTPException, UploadFile
-from fastapi.responses import FileResponse, JSONResponse
+from fastapi.responses import FileResponse, HTMLResponse, JSONResponse
 from fastapi.staticfiles import StaticFiles
 from markitdown import (
     MarkItDown,
@@ -101,6 +101,8 @@ async def convert(file: UploadFile = File(...)) -> JSONResponse:
     )
 
 
-# Serve la landing page e gli asset statici. html=True fa sì che "/" restituisca
-# index.html. Montato per ultimo così non intercetta le rotte /api e /health.
-app.mount("/", StaticFiles(directory=str(STATIC_DIR), html=True), name="static")
+@app.get("/", response_class=FileResponse)
+def index():
+    return FileResponse(str(STATIC_DIR / "index.html"))
+
+app.mount("/static", StaticFiles(directory=str(STATIC_DIR)), name="static")
